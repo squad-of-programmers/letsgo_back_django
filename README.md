@@ -23,6 +23,7 @@ python manage.py migrate
 
 
 ```bash
+cd letsgo # из корня проекта
 python manage.py runserver # включение сервера 
 ```
 `Ctrl+C` - остановка сервера

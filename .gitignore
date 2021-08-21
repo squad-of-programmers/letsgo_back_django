@@ -4,3 +4,4 @@ film_base/db.sqlite3
 **/__pycache__
 .env
 .idea
+db.*

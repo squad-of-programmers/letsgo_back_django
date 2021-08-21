@@ -18,7 +18,7 @@ pip install -r requirements.txt
 
 здесь будет инструкция по подключению бд...
 ```
-python manage.py migrate
+python manage.py migrate # по умолчанию создась db.sqlite3
 ```
 
 

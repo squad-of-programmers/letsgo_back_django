@@ -2,16 +2,35 @@ from datetime import date, datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from .serializers import BloggerListSerializer
+from .models import Blogger
+
+"""
+todo:
+login
+logout
+
+create_blogger_profile
+update_blogger_profile
+delete_blogger_profile
+
+"""
+
 
 class BloggerListAPI(APIView):
+
     def get(self, request, *args, **kwargs):
+        bloggers = Blogger.objects.all() # todo: add filter
+        serializer = BloggerListSerializer(bloggers, many=True)
+        return Response(serializer.data)
+
         data = {
             "bloggers": [
                 {
                     "id": 1,
-                    "login": "MisterIvanov67",
-                    "name": "Ivanov",
-                    "lastname": "Ivanov",
+                    "username": "MisterIvanov67",
+                    "first_name": "Ivanov",
+                    "last_name": "Ivanov",
                     "email": "some@email.com",
                     "tel": "+78002223523",
                     "avatar": "media/avatars/...",

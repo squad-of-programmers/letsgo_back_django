@@ -16,7 +16,7 @@ class BloggerProfileListSerializer(serializers.ModelSerializer):
     user = UserSerializer()
 
     title = serializers.CharField(max_length=255)
-    email = serializers.EmailField()
+    # email = serializers.EmailField()
     created_at = serializers.DateTimeField()
     tours = serializers.SlugRelatedField(slug_field='slug', read_only=True, many=True)
     

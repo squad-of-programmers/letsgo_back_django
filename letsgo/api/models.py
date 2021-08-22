@@ -6,6 +6,7 @@ from django.contrib.auth.models import User, UserManager
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 
+
 GENDER_CHOICES = (
     ('M', 'Male'),
     ('F', 'Female')

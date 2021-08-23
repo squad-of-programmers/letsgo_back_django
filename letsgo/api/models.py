@@ -6,21 +6,25 @@ from django.contrib.auth.models import User, UserManager
 from django.template.defaultfilters import slugify
 from django.urls import reverse
 
+"""
+TODO:
+* models for report_blogger_materials
+* models for chat Blogger <-> Admin
+
+"""
+
 
 GENDER_CHOICES = (
-    ('M', 'Male'),
-    ('F', 'Female')
+    ('m', 'male'),
+    ('f', 'female')
 )
-
-# ACTIVITY_CHOICES = (
-#     ('B', 'Blogger'), 
-#     ('M', 'Media') # in Russian: СМИ
-# )
 
 
 class Job(models.Model):
     """
     kind of activity
+    'b': 'blogger' 
+    'm': 'media' - in Russian: СМИ
     """
     title = models.CharField(max_length=255)
 
@@ -30,6 +34,7 @@ class Tour(models.Model):
     slug = models.SlugField()
     date = models.DateField(auto_now=False, auto_now_add=False)
     points = models.JSONField(null=True)
+
 
     def get_absolute_url(self):
         return reverse('tour_detail', kwargs={'tour_slug': self.slug}) # new
@@ -58,7 +63,8 @@ class BloggerProfile(models.Model):
     is_archive = models.BooleanField(default=False)
 
     job = models.ForeignKey("api.Job", on_delete=models.SET_NULL, null=True)
-    # kind_of_activity = models.CharField(max_length=1, choices=ACTIVITY_CHOICES)
+    tours = models.ManyToManyField("api.Tour", related_name="blogger")
+
     
     def get_absolute_url(self):
         return reverse('blogger_profile_detail', kwargs={'blogger_slug': self.slug}) # new

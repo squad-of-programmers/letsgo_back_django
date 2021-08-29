@@ -35,7 +35,10 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
+CORS_ORIGIN_ALLOW_ALL = True # delete in prodaction?
+
 INSTALLED_APPS = [
+    'corsheaders.middleware.CoreMiddleware',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

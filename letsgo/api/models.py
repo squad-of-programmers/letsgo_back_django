@@ -91,7 +91,7 @@ class Blogger(models.Model):
     first_name = models.CharField(max_length=255, null=False)
     last_name = models.CharField(max_length=255, default='')
     email = models.EmailField(max_length=255)
-
+    
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 
@@ -108,14 +108,15 @@ class Blogger(models.Model):
     
     # social_networks 
     # 1 [ ]
-    # social_networks = models.JSONField(encoder=None, decoder=None, default=Value('null'))
+    # todo: make encoder and decoder for social_networks
+    social_networks = models.JSONField(encoder=None, decoder=None, default=Value('null'))
 
     # 2 [ ]
     # instagram = models.OneToOneField("main.InstagramAccount", on_delete=models.CASCADE)
     # facebook = models.OneToOneField("main.FacebookAccount", on_delete=models.CASCADE)
     # youtube = models.OneToOneField("main.InstagramAccount", on_delete=models.CASCADE)
     
-    # 3 [x]
+    # 3 [?]
     # look at blogger field in SocialNetworkData 
 
 
@@ -135,6 +136,7 @@ class Blogger(models.Model):
         verbose_name = "Blogger"
 
 
+# ????????
 class SocialNetworkData(models.Model):
     network_title = models.ForeignKey("api.NetworkTitle", on_delete=models.CASCADE, null=False)
     blogger = models.ForeignKey("api.Blogger", on_delete=models.CASCADE)

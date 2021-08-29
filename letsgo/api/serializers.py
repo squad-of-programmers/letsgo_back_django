@@ -1,9 +1,19 @@
 from django.contrib.auth.models import User
 from django.db.models.fields.related import RelatedField
+from django.core.serializers.json import DjangoJSONEncoder
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
 from .models import Blogger, BloggerProfile, Tour
+
+from typing import Any
+
+
+# class BloggerJSONSocialNetworksEncoder(DjangoJSONEncoder):
+#     def default(self, obj: Any) -> Any:
+#         if isinstance(obj, CustomType):
+#             return str(obj)
+#         return super().default(obj)
 
 
 class UserSerializer(serializers.ModelSerializer):

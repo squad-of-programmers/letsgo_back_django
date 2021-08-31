@@ -15,6 +15,9 @@ python -m venv venv
 pip install -r requirements.txt
 # осталось подключить базу данных и включить сервер django
 ```
+
+
+
 #### важные опции (дебаг мод, секретный ключ)
 Скопируйте exmaple-файл с переменными среды
 ```bash
@@ -28,22 +31,23 @@ python manage.py shell
 >>> print(get_random_secret_key())
 >>> exit()
 ```
+
 а этой командой можно быстро добавить ключ в .env
 ```bash
+# для начала переместитесь в корневой каталог проекта(там где лежат 'venv', 'requirements.txt')
+# затем:
+dotenv set DEBUG True
 dotenv set SECRET_KEY "your_secret_key" 
 # заместо SECRET_KEY можно ставить и другие переменные что есть в .env.example
 ```
 
 Дальше настройте бд
 
-#### sqlite
-```
+
+#### postgresql...
+```bash
 python manage.py migrate # по умолчанию создась db.sqlite3
 ```
-#### mysql, postgresql...
-
-#### mongoDB
-в будущем возможно понадобиться ставить и настраивать эту бд
 
 #### запуск
 ```bash

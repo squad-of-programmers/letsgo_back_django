@@ -30,7 +30,7 @@ SECRET_KEY = env.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.get('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost']
 
 
 # Application definition
@@ -38,13 +38,13 @@ ALLOWED_HOSTS = []
 CORS_ORIGIN_ALLOW_ALL = True # delete in prodaction?
 
 INSTALLED_APPS = [
-    'corsheaders.middleware.CoreMiddleware',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'main',
     'rest_framework',
     'api',
@@ -54,11 +54,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CoreMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'letsgo.urls'
@@ -88,9 +90,17 @@ WSGI_APPLICATION = 'letsgo.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': env.get('DB_ENGINE'),
+        'NAME': env.get('DB_NAME'),
+        'USER': env.get('DB_USER'),
+        'PASSWORD': env.get('DB_PASSWORD'),
+        'HOST': env.get('DB_HOST'),
+        'PORT': env.get('DB_PORT'),
     }
 }
 

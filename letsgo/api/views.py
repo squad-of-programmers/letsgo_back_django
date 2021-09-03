@@ -20,9 +20,9 @@ delete_blogger_profile
 class BloggerListAPI(APIView):
 
     def get(self, request, *args, **kwargs):
-        bloggers = Blogger.objects.all() # todo: add filter
-        serializer = BloggerListSerializer(bloggers, many=True)
-        return Response(serializer.data)
+        # bloggers = Blogger.objects.all() # todo: add filter
+        # serializer = BloggerListSerializer(bloggers, many=True)
+        # return Response(serializer.data)
 
         data = {
             "bloggers": [

@@ -9,14 +9,14 @@ from django.urls import reverse
 """
 TODO:
 * models for report_blogger_materials
-* models for chat Blogger <-> Admin
+* models for chat 'Blogger <-> Admin'
 
 """
 
 
 GENDER_CHOICES = (
     ('m', 'male'),
-    ('f', 'female')
+    ('f', 'female'),
 )
 
 
@@ -27,130 +27,157 @@ class Job(models.Model):
     'm': 'media' - in Russian: СМИ
     """
     title = models.CharField(max_length=255)
+    description = models.CharField(max_length=1000)
 
 
 class Tour(models.Model):
     title = models.CharField(max_length=255)
-    slug = models.SlugField()
-    date = models.DateField(auto_now=False, auto_now_add=False)
-    points = models.JSONField(null=True)
+    slug = models.SlugField(unique=True, null=False)
+    start_date = models.DateField(auto_now=False, auto_now_add=False)
+    end_date = models.DateField(auto_now=False, auto_now_add=False)
+    
+    points = models.JSONField(default=dict)
 
 
     def get_absolute_url(self):
         return reverse('tour_detail', kwargs={'tour_slug': self.slug}) # new
 
     class Meta:
-        verbose_name = "Tour"
+        verbose_name = 'Tour'
 
 
-class BloggerProfile(models.Model):
-    """
-    username - in the user object
-    last_name - in the user object
+# class BloggerProfile(models.Model):
+#     """
+#     username - in the user object
+#     last_name - in the user object
 
-    Registered bloggers.
-    """
+#     Registered bloggers.
+#     """
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
-    slug = models.SlugField(null=False, unique=True)
+#     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user_profile')
+#     slug = models.SlugField(null=False, unique=True)
 
-    avatar = models.ImageField(upload_to='media/avatars', height_field='600', width_field='400')
-    # think about image sizes!
-    telephone = models.CharField(max_length=12) # for example: +7 345 678 90 12
-    location = models.CharField(max_length=255)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+#     avatar = models.ImageField(upload_to='media/avatars', height_field='600', width_field='400')
+#     # think about image sizes!
+#     telephone = models.CharField(max_length=12) # for example: +7 345 678 90 12
+#     location = models.CharField(max_length=255)
+#     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
 
-    is_archive = models.BooleanField(default=False)
+#     is_archive = models.BooleanField(default=False)
 
-    job = models.ForeignKey("api.Job", on_delete=models.SET_NULL, null=True)
-    tours = models.ManyToManyField("api.Tour", related_name="blogger")
+#     job = models.ForeignKey("api.Job", on_delete=models.SET_NULL, null=True)
+#     tours = models.ManyToManyField("api.Tour", related_name="blogger")
 
     
-    def get_absolute_url(self):
-        return reverse('blogger_profile_detail', kwargs={'blogger_slug': self.slug}) # new
-
-    def save(self, *args, **kwargs): # new
-        if not self.slug:
-            self.slug = slugify(self.user.username)
-        return super().save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = "Registered blogger"
+#     def get_absolute_url(self):
+#         return reverse('blogger_profile_detail', kwargs={'blogger_slug': self.slug}) # new
+    
 
 
 class Blogger(models.Model):
     """
-    Those bloggers that were found using algorithms on different social networks.
     You can select some and send them an invitation to the event with a registration link.
 
-    Те блогеры, что были найдены с помощью алгоритмов на разных соцсетях.
-    Можно отобрать некоторых и отправить им приглашение на мероприятие с ссылкой регистрацию.
+    Можно отобрать некоторых и отправить им приглашение на мероприятие с ссылкой на регистрацию.
     """
 
-    slug = models.SlugField(null=False, unique=True)
-    first_name = models.CharField(max_length=255, null=False)
-    last_name = models.CharField(max_length=255, default='')
-    email = models.EmailField(max_length=255)
+    # pk if blogger is regestered else null
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, related_name='blogger_profile', null=True)
+
+    slug = models.SlugField(unique=True, null=False)
+    username = models.CharField(max_length=255, null=False)
+    first_name = models.CharField(max_length=255, null=True)
+    last_name = models.CharField(max_length=255, null=True)
+    email = models.EmailField(max_length=255, null=True)
+
+    avatar_xl = models.ImageField(upload_to='media/avatars/xl', height_field='500', width_field='400', null=True)
+    avatar_lg = models.ImageField(upload_to='media/avatars/lg', height_field='100', width_field='100', null=True)
+    avatar_sm = models.ImageField(upload_to='media/avatars/sm', height_field='32', width_field='32', null=True)
     
-    created_at = models.DateTimeField()
-    updated_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     is_archive = models.BooleanField(default=False)
 
-    telephone = models.CharField(max_length=12) # for example: +7 345 678 90 12
-    location = models.CharField(max_length=255)
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
-    
-    job = models.ForeignKey("api.Job", on_delete=models.SET_NULL, null=True)
+    telephone = models.CharField(max_length=12, null=True) # for example: +7 345 678 90 12
+    location = models.CharField(max_length=255, null=True)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True)
+    age = models.IntegerField(null=True)
+
+    job = models.ForeignKey('api.Job', related_name='bloggers', on_delete=models.SET_NULL, null=True)
 
     count_success_tours = models.IntegerField()
-    tours = models.ManyToManyField("api.Tour", related_name="blogger")
+    tours = models.ManyToManyField('api.Tour', related_name='bloggers', through='api.BloggerTour')
     
     # social_networks 
     # 1 [ ]
     # todo: make encoder and decoder for social_networks
-    social_networks = models.JSONField(encoder=None, decoder=None, default=Value('null'))
-
-    # 2 [ ]
-    # instagram = models.OneToOneField("main.InstagramAccount", on_delete=models.CASCADE)
-    # facebook = models.OneToOneField("main.FacebookAccount", on_delete=models.CASCADE)
-    # youtube = models.OneToOneField("main.InstagramAccount", on_delete=models.CASCADE)
-    
-    # 3 [?]
-    # look at blogger field in SocialNetworkData 
+    # {
+    #   {
+    #       'title': 'facebook',
+    #       'username': 'nikita',
+    #       'link': 'https://facebook.com/nikita99',
+    #       'num_subscribers': 99,
+    #       'num_publications': 45,
+    #       'publications_per_month': 18,
+    #       'subscribers_per_month': 11, 
+    #   }
+    # } 
+    social_networks = models.JSONField(default=dict)
 
 
     def __str__(self):
-        return self.name
+        return self.get_name()
 
     def get_absolute_url(self):
         return reverse('blogger_detail', kwargs={'blogger_slug': self.slug})
     
+    def get_name(self):
+        return self.first_name + ' ' + self.last_name
+
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            self.slug = slugify(self.get_name())
         return super().save(*args, **kwargs)
 
 
     class Meta:
-        verbose_name = "Blogger"
+        verbose_name = 'Blogger'
+
+
+INVITATION_STATUS_CHOICES = (
+    ('i', 'invited'),
+    ('a', 'accepted'),
+    ('r', 'regected')
+)
+
+
+class BloggerTour(models.Model):
+    blogger = models.ForeignKey('api.Blogger', on_delete=models.CASCADE)
+    tour = models.ForeignKey('api.Tour', on_delete=models.CASCADE)
+
+    date_joined = models.DateField(null=True)
+    date_invited = models.DateField(null=True)
+
+    invitation_status = models.CharField(max_length=1, choices=INVITATION_STATUS_CHOICES, default='i')
+    was_skipped = models.BooleanField() # Ether the blogger visited or skipped the tour
 
 
 # ????????
-class SocialNetworkData(models.Model):
-    network_title = models.ForeignKey("api.NetworkTitle", on_delete=models.CASCADE, null=False)
-    blogger = models.ForeignKey("api.Blogger", on_delete=models.CASCADE)
-    username = models.CharField(max_length=255)
-    link = models.URLField(max_length=255, null=True)
-    num_subscribers = PositiveBigIntegerField(null=True)
-    num_publications = PositiveBigIntegerField(null=True)
+# class SocialNetworkData(models.Model):
+#     network_title = models.ForeignKey("api.NetworkTitle", on_delete=models.CASCADE, null=False)
+#     blogger = models.ForeignKey("api.Blogger", on_delete=models.CASCADE)
+#     username = models.CharField(max_length=255)
+#     link = models.URLField(max_length=255, null=True)
+#     num_subscribers = PositiveBigIntegerField(null=True)
+#     num_publications = PositiveBigIntegerField(null=True)
 
-    class Meta:
-        verbose_name = "Social network data"
+#     class Meta:
+#         verbose_name = "Social network data"
 
 
-class NetworkTitle(models.Model):
-    title = models.CharField(max_length=255)
+# class NetworkTitle(models.Model):
+#     title = models.CharField(max_length=255)
 
-    class Meta:
-        verbose_name = "Network title"
+#     class Meta:
+#         verbose_name = "Network title"

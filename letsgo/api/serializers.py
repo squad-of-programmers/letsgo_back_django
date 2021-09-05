@@ -88,13 +88,16 @@ class BloggerDetailSerializer(serializers.ModelSerializer):
 
 class TourListSerializer(serializers.ModelSerializer):
 
-    title = serializers.CharField(max_length=255)
-    created_at = serializers.DateTimeField(format="%Y:%m:%d")
+    # title = serializers.CharField(max_length=255)
+    created_at = serializers.DateTimeField(format='%Y:%m:%d')
+    updated_at = serializers.DateTimeField(format='%Y:%m:%d')
+    start_date = serializers.DateField(format='%Y:%m:%d')
+    end_date = serializers.DateField(format='%Y:%m:%d')
 
 
     class Meta:
         model = Tour
-        exclude = ('points')
+        fields = '__all__'
 
 
 class TourDetailSerializer(serializers.ModelSerializer):

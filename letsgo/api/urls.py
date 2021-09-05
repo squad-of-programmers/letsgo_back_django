@@ -3,8 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    #?start=0
-    # &end=5 
+    # ?from=0
+    # &to=5 
     # &registered=True
     # &name_contains=nikita
     # &age_below=34

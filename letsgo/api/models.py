@@ -61,8 +61,7 @@ class Blogger(models.Model):
     You can select some and send them an invitation to the event with a registration link.
     Можно отобрать некоторых и отправить им приглашение на мероприятие с ссылкой на регистрацию.
 
-    username - in the user object
-    last_name - in the user object
+    in the user object: username, first_name, last_name
     """
 
     # pk if blogger is regestered else null
@@ -93,7 +92,8 @@ class Blogger(models.Model):
     count_success_tours = models.IntegerField()
     tours = models.ManyToManyField('api.Tour', related_name='bloggers', through='api.BloggerTour')
     
-    # social_networks 
+    # social_networks
+    # example: 
     # 1 [ ]
     # todo: make encoder and decoder for social_networks
     # {
@@ -116,8 +116,8 @@ class Blogger(models.Model):
     def get_absolute_url(self):
         return reverse('blogger_detail', kwargs={'blogger_slug': self.slug})
     
-    # def get_name(self):
-    #     return self.first_name + ' ' + self.last_name
+    def get_name(self):
+        return self.first_name + ' ' + self.last_name
 
     def save(self, *args, **kwargs):
         if not self.slug:

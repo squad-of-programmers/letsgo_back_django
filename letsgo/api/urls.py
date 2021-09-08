@@ -6,21 +6,26 @@ urlpatterns = [
     # ?from=0
     # &to=5 
     # &registered=True
+    # &is_archive=True 
     # &name_contains=nikita
-    # &age_below=34
-    # &age_above=18
     # &gender='m'|'f'
-    # &job='blogger'|'media' #
     # &location='Ulyanovsk'
-    # &tours_num_above=2
-    # &tours_num_below=4
+    # &age_gt=18
+    # &age_lt=34
+    # &tours_num_gt=2
+    # &tours_num_lt=4
+    # &tour_participant=3 # id of the tour 
+
+    # &job='blogger'|'media' 
     # &in_tour=True
     # &is_invited=False
-    # &is
+    # &get_tours=True
+    # &get_social_networks=True
     path('bloggers', views.BloggerListAPI.as_view(), name='blogger_list'),
-
-    # path('bloggers/registered', views.BloggerListAPI.as_view(), name='blogger_prifile_list'),
-    path('bloggers/<slug:blogger_slug>', views.BloggerDetailAPI.as_view(), name='blogger_detail'),
+    path('bloggers/toggle_ban', views.ToggleBanAPI.as_view(), name='blogger_list'),
+    path('bloggers/<slug:blogger_slug>',
+        views.BloggerDetailAPI.as_view(), 
+        name='blogger_detail'),
 
     # path('blogger_profiles/<slug:blogger_slug>', views.BloggerDetailAPI.as_view(), name='blogger_profile_detail'),
 

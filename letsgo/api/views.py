@@ -1,9 +1,12 @@
 from datetime import date, datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.db.models import Q
 
-from .serializers import BloggerListSerializer, TourListSerializer
+from .serializers import BloggerDetailSerializer, BloggerListSerializer, TourDetailSerializer, TourListSerializer
 from .models import Blogger, Tour
+
+
 
 """
 todo:
@@ -18,12 +21,80 @@ delete_blogger
 
 
 class BloggerListAPI(APIView):
+    DEFAULT_BLOGGER_LIMIT = 10
+
+    available_filters = {
+        'name_contains': lambda val: Q(
+                Q(first_name__contains=val['name_contains']) | \
+                Q(last_name__contains=val['name_contains'])
+            ),
+        'username_contains': lambda val: Q(username__contains=val['username_contains']),
+        'regestered': lambda val: Q(user__isnull=val['regestered']),
+        'gender': lambda val: Q(gender__iexact=val['gender']),
+        'location': lambda val: Q(locations__icontains=val['location']),
+        'is_archive': lambda val: Q(is_archive=val['is_archive']),        
+        'job': lambda val: Q(job__title__iexact=val['job']),
+        'tour_participant': lambda val: Q(tours__pk=val['tour_participant']),
+        'age_gt': lambda val: Q(age__gt=val['age_gt']), 
+        'age_lt': lambda val: Q(age__gt=val['age_lt']),
+        'success_tours_gt': lambda val: Q(count_success_tours__gt=val['age_gt']),
+        'success_tours_lt': lambda val: Q(count_success_tours__lt=val['age_lt']),
+    }
+
+    def get_blogger_filters(self, kwargs:dict):
+        filters = Q()
+
+        for filter_key in kwargs:
+            if filter_key in self.available_filters:
+                filters &= self.available_filters[filter_key](kwargs)
+
+        return filters
+        # filters = \
+            # Q(
+            #     Q(first_name__contains=kwargs['name_contains']) | \
+            #     Q(last_name__contains=kwargs['name_contains'])
+            # ) & \
+            # Q(username__contains=kwargs['username_contains']) & \
+            # Q(user__isnull=kwargs['regestered']) & \
+            # Q(gender__iexact=kwargs['gender']) & \
+            # Q(locations__icontains=kwargs['location']) & \
+            # Q(age__range=(kwargs['age_gt'], kwargs['age_lt'])) & \
+            # Q(is_archive=kwargs['is_archive']) & \
+            # Q(count_success_tours__gt=kwargs['success_tours_gt']) & \
+            # Q(count_success_tours__lt=kwargs['success_tours_lt']) & \
+            # Q(job__title__iexact=kwargs['job'])
+            
+
+        return filters
+    
 
     def get(self, request, *args, **kwargs):
-        bloggers = Blogger.objects.filter()
+        """
+        kwargs = {
+            'from': Int(>=0),
+            'to': Int(>=0),
+            'registered': bool,
+            'username_contains': str,
+            'name_contains': str,
+            'gender': Str('m'|'f'),
+            ''
+        }
+        """
 
-        serializer = BloggerListSerializer(bloggers, many=True)
+        if 'from' not in kwargs:
+            kwargs['from'] = 0
 
+        if 'to' not in kwargs:
+            kwargs['to'] = kwargs['from'] + self.DEFAULT_BLOGGER_LIMIT
+
+        blogger_filters = self.get_blogger_filters(kwargs)
+
+        if blogger_filters:
+            bloggers = Blogger.objects.filter(blogger_filters)[kwargs['from']:kwargs['to']]
+        else:
+            bloggers = Blogger.objects.all()[kwargs['from']:kwargs['to']]
+        
+        serializer = BloggerListSerializer(bloggers, many=True) # todo: get user_data 
         return Response(serializer.data)
 
         # data = {
@@ -46,13 +117,13 @@ class BloggerListAPI(APIView):
         #             "is_archive": True, 
         #             "social_networks": {
         #                 "facebook": {
-        #                 "link": "facebook.com/ivan",
-        #                 "subscribers": 34
+        #                     "link": "facebook.com/ivan",
+        #                     "subscribers": 34
         #                 },
         #                 "instagram": {
-        #                 "link": "instagram.com/ivan",
-        #                 "subscribers": 378,
-        #                 "posts": 343
+        #                     "link": "instagram.com/ivan",
+        #                     "subscribers": 378,
+        #                     "posts": 343
         #                 },
         #             }                
         #         },
@@ -77,22 +148,27 @@ class BloggerListAPI(APIView):
         return Response({"testUpdate": "ok"})
 
 
-class BanBlogger(APIView):
+class ToggleBanAPI(APIView):
     def patch(self, request, *args, **kwargs):
-        return Response({"testUpdate": "ok"})
+        return Response({"Banned": True})
 
 
-class SearchNewBloggers(APIView):
+class SearchNewBloggersAPI(APIView):
     def get(self, request, *args, **kwargs):
-        ...
+        """
+        Request for creating new bloggers (searching new bloggers and put that in the db)
+        """
+        return Response({"testSearchBloggers": "ok"})
 
 
 class BloggerDetailAPI(APIView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request, blogger_id, *args, **kwargs):
         """
         get one of the bloggers
         """
-        return Response()
+        blogger = Blogger.objects.get(pk=blogger_id)
+        serializer = BloggerDetailSerializer(blogger)
+        return Response(serializer.data)
 
 
     def put(self, request, *args, **kwargs):
@@ -116,11 +192,12 @@ class TourListAPI(APIView):
     
 
 class TourDetailAPI(APIView):
-    def get(self, request, *args, **kwargs):
+    def get(self, request, tour_id, *args, **kwargs):
         """get points and all data of the tour"""
 
-        data = {}
-        return Response(data)
+        tour = Tour.objects.get(pk=tour_id)
+        serializer = TourDetailSerializer(tour)
+        return Response(serializer.data)
 
 
     def post(self, request, *args, **kwargs):

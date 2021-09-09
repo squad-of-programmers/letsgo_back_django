@@ -49,35 +49,26 @@ class BloggerListAPI(APIView):
                 filters &= self.available_filters[filter_key](kwargs)
 
         return filters
-        # filters = \
-            # Q(
-            #     Q(first_name__contains=kwargs['name_contains']) | \
-            #     Q(last_name__contains=kwargs['name_contains'])
-            # ) & \
-            # Q(username__contains=kwargs['username_contains']) & \
-            # Q(user__isnull=kwargs['regestered']) & \
-            # Q(gender__iexact=kwargs['gender']) & \
-            # Q(locations__icontains=kwargs['location']) & \
-            # Q(age__range=(kwargs['age_gt'], kwargs['age_lt'])) & \
-            # Q(is_archive=kwargs['is_archive']) & \
-            # Q(count_success_tours__gt=kwargs['success_tours_gt']) & \
-            # Q(count_success_tours__lt=kwargs['success_tours_lt']) & \
-            # Q(job__title__iexact=kwargs['job'])
-            
-
-        return filters
     
 
     def get(self, request, *args, **kwargs):
         """
-        kwargs = {
+        kwargs={
             'from': Int(>=0),
             'to': Int(>=0),
             'registered': bool,
-            'username_contains': str,
             'name_contains': str,
+            'username_contains': str,
+            'regestered': bool,
             'gender': Str('m'|'f'),
-            ''
+            'location': str,
+            'is_archive': bool,
+            'job': Int(job_pk),
+            'tour_participant': Int(tour_id),
+            'age_gt': int,
+            'age_lt': int,
+            'success_tours_gt': int,
+            'success_tours_lt': int,
         }
         """
 

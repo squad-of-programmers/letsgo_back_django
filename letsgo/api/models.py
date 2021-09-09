@@ -48,7 +48,7 @@ class Tour(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = unique_slugify(self, field_name='title')
+            self.slug = unique_slugify(self, fields='title')
 
         return super().save(*args, **kwargs)
 
